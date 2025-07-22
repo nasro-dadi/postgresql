@@ -3,7 +3,6 @@ services:
     image: postgres:16-alpine
     container_name: postgres_db
     restart: unless-stopped
-    user: '999:999' # Run as postgres user for security
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-myapp}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -13,17 +12,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d:ro
       - ./backups:/backups
-      - ./ssl:/var/lib/postgresql/ssl:ro
     ports:
-      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     networks:
       - postgres_network
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-myapp}',
-        ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-myapp}"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -51,9 +45,6 @@ services:
       -c log_disconnections=on
       -c log_lock_waits=on
       -c log_checkpoints=on
-      -c ssl=on
-      -c ssl_cert_file=/var/lib/postgresql/ssl/server.crt
-      -c ssl_key_file=/var/lib/postgresql/ssl/server.key
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -67,7 +58,7 @@ services:
       - pgadmin_data:/var/lib/pgadmin
       - ./pgadmin/servers.json:/pgadmin4/servers.json
     ports:
-      - '127.0.0.1:${PGADMIN_PORT:-8080}:80'
+      - "127.0.0.1:${PGADMIN_PORT:-8080}:80"
     networks:
       - postgres_network
     depends_on:
