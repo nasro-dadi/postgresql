@@ -1,0 +1,28 @@
+# Dockerfile for backup scheduler
+FROM alpine:3.18
+
+# Install required packages
+RUN apk add --no-cache \
+    bash \
+    docker-cli \
+    dcron \
+    tzdata
+
+# Set timezone to match the host system
+ENV TZ=Africa/Algiers
+
+# Create app directory
+WORKDIR /app
+
+# Copy scripts
+COPY scripts/scheduler.sh /app/scripts/
+COPY scripts/backup-docker.sh /app/scripts/
+
+# Make scripts executable
+RUN chmod +x /app/scripts/scheduler.sh /app/scripts/backup-docker.sh
+
+# Create log directory
+RUN mkdir -p /app/backups
+
+# Start scheduler
+CMD ["/app/scripts/scheduler.sh"]

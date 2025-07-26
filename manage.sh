@@ -25,6 +25,7 @@ show_usage() {
     echo "  status     - Show status of services"
     echo "  logs       - Show logs for PostgreSQL"
     echo "  backup     - Create a database backup"
+    echo "  scheduler  - Show backup scheduler logs"
     echo "  restore    - Restore from a backup file"
     echo "  psql       - Connect to PostgreSQL CLI"
     echo "  ssl        - Generate SSL certificates"
@@ -66,6 +67,7 @@ case "$1" in
         echo -e "${GREEN}Services started successfully!${NC}"
         echo -e "${BLUE}PostgreSQL is available on port 5432${NC}"
         echo -e "${BLUE}PgAdmin is available on http://localhost:8080${NC}"
+        echo -e "${BLUE}Backup scheduler is running with schedule: ${BACKUP_SCHEDULE:-0 2 * * *}${NC}"
         ;;
     "stop")
         echo -e "${YELLOW}Stopping PostgreSQL services...${NC}"
@@ -89,6 +91,10 @@ case "$1" in
     "backup")
         echo -e "${YELLOW}Creating backup...${NC}"
         ./scripts/backup.sh
+        ;;
+    "scheduler")
+        echo -e "${BLUE}Backup Scheduler Logs:${NC}"
+        docker compose logs -f backup-scheduler
         ;;
     "restore")
         echo -e "${YELLOW}Restoring from backup...${NC}"

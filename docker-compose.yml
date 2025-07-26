@@ -69,6 +69,31 @@ services:
       postgres:
         condition: service_healthy
 
+  backup-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.scheduler
+    container_name: backup_scheduler
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-myapp}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+    volumes:
+      - ./backups:/app/backups
+      - ./.env:/app/.env:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts:/app/scripts
+    networks:
+      - postgres_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    cap_add:
+      - SYS_ADMIN
+
 volumes:
   postgres_data:
     driver: local

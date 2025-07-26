@@ -1,6 +1,16 @@
 # PostgreSQL Docker Compose Setup
 
-A production-ready PostgreSQL setup with Docker Compose, featuring security best practices, automated backups, and PgAdmin for database management.
+A product| Variable               | Description              | Default                |
+| ---------------------- | ------------------------ | ---------------------- |
+| `POSTGRES_DB`          | Database name            | `myapp`                |
+| `POSTGRES_USER`        | Database user            | `postgres`             |
+| `POSTGRES_PASSWORD`    | Database password        | **Required**           |
+| `POSTGRES_PORT`        | Database port            | `5432`                 |
+| `PGADMIN_EMAIL`        | PgAdmin login email      | `admin@example.com`    |
+| `PGADMIN_PASSWORD`     | PgAdmin password         | **Required**           |
+| `PGADMIN_PORT`         | PgAdmin web port         | `8080`                 |
+| `BACKUP_RETENTION_DAYS`| Backup retention period  | `7`                    |
+| `BACKUP_SCHEDULE`      | Cron schedule for backups| `"35 10 * * *"` (10:35 AM)| PostgreSQL setup with Docker Compose, featuring security best practices, automated backups, and PgAdmin for database management.
 
 ## Features
 
@@ -63,6 +73,7 @@ Use the `manage.sh` script for easy management:
 ./manage.sh status     # Show service status
 ./manage.sh logs       # Show PostgreSQL logs
 ./manage.sh backup     # Create database backup
+./manage.sh scheduler  # Show backup scheduler logs
 ./manage.sh restore    # Restore from backup
 ./manage.sh psql       # Connect to PostgreSQL CLI
 ./manage.sh reset      # Reset all data (DANGEROUS!)
@@ -79,7 +90,22 @@ Add your own initialization scripts here (they'll run in alphabetical order).
 
 ## Backup and Restore
 
-### Automated Backups
+### Automated Backup Scheduler
+
+The setup includes an automated backup scheduler that runs inside a Docker container:
+
+```bash
+# The backup scheduler runs automatically based on BACKUP_SCHEDULE in .env
+# Default: "35 10 * * *" (Daily at 10:35 AM)
+
+# View scheduler logs
+./manage.sh scheduler
+
+# Check backup logs
+cat backups/backup.log
+```
+
+### Manual Backups
 
 ```bash
 # Create a manual backup

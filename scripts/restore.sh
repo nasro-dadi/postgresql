@@ -66,6 +66,11 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
+echo -e "${YELLOW}Dropping and recreating database...${NC}"
+# Drop the database and recreate it
+docker exec -i "$CONTAINER_NAME" env PGPASSWORD="$POSTGRES_PASSWORD" psql -U "$POSTGRES_USER" -d postgres -c "DROP DATABASE IF EXISTS \"$POSTGRES_DB\";"
+docker exec -i "$CONTAINER_NAME" env PGPASSWORD="$POSTGRES_PASSWORD" psql -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE \"$POSTGRES_DB\";"
+
 # Decompress if needed and restore
 if [[ $BACKUP_FILE == *.gz ]]; then
     echo -e "${YELLOW}Decompressing and restoring backup...${NC}"
